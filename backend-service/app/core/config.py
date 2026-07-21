@@ -25,6 +25,20 @@ class Settings(BaseSettings):
 
     openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
     serper_api_key: str | None = Field(default=None, alias="SERPER_API_KEY")
+    azure_storage_connection_string: str | None = Field(
+            default=None,
+            alias="AZURE_STORAGE_CONNECTION_STRING",
+        )
+
+    azure_original_documents_container: str = Field(
+            default="original-documents",
+            alias="AZURE_ORIGINAL_DOCUMENTS_CONTAINER",
+        )
+
+    azure_extracted_images_container: str = Field(
+            default="extracted-images",
+            alias="AZURE_EXTRACTED_IMAGES_CONTAINER",
+        )
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -32,6 +46,26 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
     )
+    
+    # ------------------------------------------------------------------
+    # Structure-aware Chunking
+    # ------------------------------------------------------------------
+
+    chunk_target_tokens: int = Field(
+        default=500,
+        alias="CHUNK_TARGET_TOKENS",
+    )
+
+    chunk_max_tokens: int = Field(
+        default=700,
+        alias="CHUNK_MAX_TOKENS",
+    )
+
+    chunk_overlap_tokens: int = Field(
+        default=75,
+        alias="CHUNK_OVERLAP_TOKENS",
+    )
+
 
 
 @lru_cache

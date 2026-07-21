@@ -3,3 +3,6 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 python-dotenv
+azure-storage-blob
+PyMuPDF
+python-docx
