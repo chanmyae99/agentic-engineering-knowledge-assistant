@@ -29,3 +29,6 @@ class InvalidImageError(IngestionError):
 
 class EmptyDocumentError(IngestionError):
     """Raised when a parsed document contains no usable text or images."""
+
+class UnsupportedDocumentTypeError(IngestionError):
+    """Raised when an unsupported document type is supplied."""

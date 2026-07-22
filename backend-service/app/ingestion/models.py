@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any
 
+from pydantic import BaseModel, ConfigDict, Field
+
 
 @dataclass
 class TextUnit:
@@ -118,8 +120,15 @@ class ParsedDocument:
                 "file_type must not be empty."
             )
 
+
 class IngestionResult(BaseModel):
     """Result of parsing and captioning a document."""
 
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
+
     parsed_document: ParsedDocument
-    captioned_images: list[CaptionedImage] = Field(default_factory=list)
+    captioned_images: list[CaptionedImage] = Field(
+        default_factory=list
+    )

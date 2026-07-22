@@ -2,17 +2,14 @@ from pydantic import BaseModel, Field
 
 
 class ChatRequest(BaseModel):
-    """Incoming chat request."""
+    """Request body for the chat endpoint."""
 
     question: str = Field(
         ...,
         min_length=1,
-        description="User question"
+        max_length=2000,
+        description="Question for the engineering knowledge assistant.",
+        examples=[
+            "What PPE should employees wear?",
+        ],
     )
-
-
-class ChatResponse(BaseModel):
-    """Outgoing chat response."""
-
-    answer: str
-    source: str

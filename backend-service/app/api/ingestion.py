@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException, status
 
-from app.core.config import get_settings
-from app.ingestion.document_parser import (
-    DocumentParser,
-    UnsupportedDocumentTypeError,
-)
+from fastapi import APIRouter, File, HTTPException, UploadFile, status
+
+from app.ingestion.document_parser import DocumentParser
+from app.ingestion.exceptions import UnsupportedDocumentTypeError
 from app.ingestion.ingestion_service import IngestionService
 from app.schemas.ingestion import (
     IngestionRequest,
