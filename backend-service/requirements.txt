@@ -20,6 +20,7 @@ isodate==0.7.2
 jiter==0.16.0
 lxml==6.1.1
 openai==2.46.0
+pillow==12.3.0
 pycparser==3.0
 pydantic==2.13.4
 pydantic-settings==2.14.2
