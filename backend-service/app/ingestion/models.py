@@ -117,3 +117,9 @@ class ParsedDocument:
             raise ValueError(
                 "file_type must not be empty."
             )
+
+class IngestionResult(BaseModel):
+    """Result of parsing and captioning a document."""
+
+    parsed_document: ParsedDocument
+    captioned_images: list[CaptionedImage] = Field(default_factory=list)

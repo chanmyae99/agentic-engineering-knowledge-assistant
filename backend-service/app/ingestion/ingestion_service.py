@@ -3,6 +3,7 @@ from app.ingestion.document_parser import DocumentParser
 from app.ingestion.models import (
     CaptionedImage,
     ParsedDocument,
+    IngestionResult,
 )
 from app.storage.blob_storage import BlobStorage
 
@@ -45,24 +46,23 @@ class IngestionService:
     async def extract_and_caption_document(
         self,
         blob_name: str,
-    ) -> tuple[ParsedDocument, list[CaptionedImage]]:
-        """
-        Download and parse a document, then caption its extracted images.
-        """
-        parsed_document = self.extract_document(
-            blob_name=blob_name,
-        )
+    ) -> IngestionResult:
+        """Download, parse and caption a document."""
+
+        parsed_document = self.extract_document(blob_name)
 
         if self._caption_service is None:
             raise RuntimeError(
-                "CaptionService is required for image caption generation."
+                "CaptionService has not been configured."
             )
 
-        if not parsed_document.images:
-            return parsed_document, []
-
-        captioned_images = await self._caption_service.caption_images(
-            images=parsed_document.images,
+        captioned_images = (
+            await self._caption_service.caption_images(
+                parsed_document.images
+            )
         )
 
-        return parsed_document, captioned_images
+        return IngestionResult(
+            parsed_document=parsed_document,
+            captioned_images=captioned_images,
+        )
