@@ -11,7 +11,29 @@ class MockChunkRepository(ChunkRepository):
         query_embedding: list[float],
         top_k: int,
     ) -> list[RetrievedChunk]:
-        return [
+        normalized_query = query_text.strip().lower()
+
+        ppe_keywords = {
+            "ppe",
+            "helmet",
+            "helmets",
+            "glove",
+            "gloves",
+            "safety shoe",
+            "safety shoes",
+            "protective equipment",
+            "personal protective equipment",
+        }
+
+        is_ppe_question = any(
+            keyword in normalized_query
+            for keyword in ppe_keywords
+        )
+
+        if not is_ppe_question:
+            return []
+
+        chunks = [
             RetrievedChunk(
                 chunk_id="chunk-001",
                 document_id="document-001",
@@ -39,4 +61,6 @@ class MockChunkRepository(ChunkRepository):
                     "page": 5,
                 },
             ),
-        ][:top_k]
+        ]
+
+        return chunks[:top_k]

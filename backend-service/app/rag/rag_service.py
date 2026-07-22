@@ -4,6 +4,7 @@ from app.embedding.embedding_service import EmbeddingService
 from app.embedding.models import EmbeddingVector
 from app.rag.llm_client import LLMClient
 from app.rag.models import RAGResponse, SourceReference
+from app.retrieval.models import RetrievedChunk
 from app.rag.prompt_builder import PromptBuilder
 from app.retrieval.retrieval_service import RetrievalService
 
@@ -110,4 +111,46 @@ class RAGService:
         raise ValueError(
             "EmbeddingVector does not contain values, embedding, "
             "or vector data."
+        )
+
+    async def answer_from_chunks(
+        self,
+        question: str,
+        chunks: list[RetrievedChunk],
+    ) -> RAGResponse:
+        if not isinstance(question, str) or not question.strip():
+            raise ValueError("Question must not be empty.")
+
+        if not chunks:
+            raise ValueError(
+                "At least one retrieved chunk is required."
+            )
+
+        prompt = PromptBuilder.build(
+            question=question.strip(),
+            chunks=chunks,
+        )
+
+        answer = await self._llm_client.generate(prompt)
+
+        sources = [
+            SourceReference(
+                document_name=str(
+                    chunk.metadata.get(
+                        "document_name",
+                        chunk.document_id,
+                    )
+                ),
+                page=chunk.metadata.get("page"),
+                score=chunk.score,
+            )
+            for chunk in chunks
+        ]
+
+        return RAGResponse(
+            answer=answer,
+            sources=sources,
+            metadata={
+                "retrieved_chunk_count": len(chunks),
+            },
         )
