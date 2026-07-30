@@ -1,0 +1,117 @@
+Project knowledge_assistant_database {
+  database_type: "PostgreSQL"
+  Note: "Hybrid RAG database using PostgreSQL and pgvector. Original documents and extracted images are stored in Azure Blob Storage."
+}
+
+Table documents {
+  id uuid [pk, not null]
+
+  file_name varchar(255) [not null]
+  file_type varchar(20) [not null]
+
+  source_container varchar(100) [not null]
+  source_blob_name text [not null]
+
+  mime_type varchar(100)
+  file_size_bytes bigint
+  checksum varchar(64)
+
+  processing_status varchar(30) [not null, default: 'pending']
+  processing_error text
+
+  metadata jsonb [not null, default: `'{}'`]
+
+  created_at timestamptz [not null]
+  updated_at timestamptz [not null]
+
+  indexes {
+    (source_container, source_blob_name) [unique]
+    checksum
+    processing_status
+  }
+
+  Note: "One record represents one original document stored in Azure Blob Storage."
+}
+
+Table document_chunks {
+  id uuid [pk, not null]
+
+  document_id uuid [not null, ref: > documents.id]
+
+  chunk_index int [not null]
+
+  content text [not null]
+
+  source_type varchar(20) [not null]
+  chunk_type varchar(30) [not null, default: 'text']
+
+  page_number int
+
+  section_title text
+
+  header_text text
+  header_level int
+  header_path jsonb
+
+  paragraph_number int
+
+  token_count int
+
+  embedding vector [note: "VECTOR(1536) generated using text-embedding-3-small"]
+
+  metadata jsonb [not null, default: `'{}'`]
+
+  created_at timestamptz [not null]
+
+  indexes {
+    (document_id, chunk_index) [unique]
+    document_id
+    page_number
+    source_type
+  }
+
+  Note: "Stores searchable text chunks together with structure-aware metadata and semantic embeddings."
+}
+
+Table document_images {
+  id uuid [pk, not null]
+
+  document_id uuid [not null, ref: > documents.id]
+
+  image_index int [not null]
+
+  page_number int
+
+  section_title text
+
+  image_file_name varchar(255) [not null]
+
+  image_container varchar(100) [not null]
+  image_blob_name text [not null]
+
+  image_extension varchar(20)
+
+  mime_type varchar(100)
+
+  width int
+  height int
+
+  image_hash varchar(64)
+
+  caption text [not null]
+
+  caption_embedding vector [note: "VECTOR(1536) generated using text-embedding-3-small"]
+
+  metadata jsonb [not null, default: `'{}'`]
+
+  created_at timestamptz [not null]
+
+  indexes {
+    (image_container, image_blob_name) [unique]
+    document_id
+    page_number
+    image_hash
+  }
+
+  Note: "Stores image metadata and captions. Image bytes remain in Azure Blob Storage."
+}
