@@ -2,7 +2,15 @@ from abc import ABC, abstractmethod
 
 
 class BlobStorage(ABC):
-    """Storage contract used by the ingestion service."""
+    """Interface for document and image blob storage."""
+
+    @abstractmethod
+    def list_blobs(
+        self,
+        container_name: str,
+    ) -> list[str]:
+        """Return all blob names in a container."""
+        raise NotImplementedError
 
     @abstractmethod
     def download_blob(
@@ -10,7 +18,7 @@ class BlobStorage(ABC):
         container_name: str,
         blob_name: str,
     ) -> bytes:
-        """Download a blob and return its binary content."""
+        """Download one blob."""
         raise NotImplementedError
 
     @abstractmethod
@@ -21,5 +29,5 @@ class BlobStorage(ABC):
         data: bytes,
         content_type: str | None = None,
     ) -> str:
-        """Upload binary data and return the stored blob name."""
+        """Upload one blob and return its stored name."""
         raise NotImplementedError

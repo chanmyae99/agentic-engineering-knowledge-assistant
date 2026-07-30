@@ -163,7 +163,13 @@ class ImageExtractor:
             ) from exc
 
         for relationship in relationships:
-            target_part = getattr(relationship, "target_part", None)
+            if getattr(relationship, "is_external", False):
+                continue
+
+            try:
+                target_part = relationship.target_part
+            except (ValueError, AttributeError):
+                continue
 
             if target_part is None:
                 continue

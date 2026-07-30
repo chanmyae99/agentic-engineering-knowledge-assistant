@@ -13,7 +13,10 @@ from app.repositories.postgres_chunk_repository import (
 )
 from app.retrieval.retrieval_service import RetrievalService
 from app.web_search.serper_client import SerperClient
-
+from app.repositories.postgres_ingestion_repository import (
+    PostgresIngestionRepository,
+)
+from app.chunking.chunking_service import ChunkingService
 
 class ServiceContainer:
     """Create and manage shared application services."""
@@ -35,17 +38,26 @@ class ServiceContainer:
         )
 
         # --------------------------------------------------------------
-        # Repository
-        # Select the repository implementation based on configuration.
+        # Repositories
+        # Configure retrieval and ingestion persistence.
         # --------------------------------------------------------------
 
         self.chunk_repository = self._create_chunk_repository(
             settings=settings,
         )
 
+        self.ingestion_repository = PostgresIngestionRepository()
+
+        # --------------------------------------------------------------
+        # Chunking
+        # Convert parsed document units into validated structured chunks.
+        # --------------------------------------------------------------
+
+        self.chunking_service = ChunkingService()
+
         # --------------------------------------------------------------
         # Embedding
-        # Generate vector embeddings for user queries.
+        # Generate vector embeddings for queries and document chunks.
         # --------------------------------------------------------------
 
         self.embedding_client = OpenAIEmbeddingClient(
@@ -60,7 +72,7 @@ class ServiceContainer:
 
         # --------------------------------------------------------------
         # Retrieval
-        # Retrieve the most relevant document chunks.
+        # Retrieve the most relevant chunks from the configured store.
         # --------------------------------------------------------------
 
         self.retrieval_service = RetrievalService(
