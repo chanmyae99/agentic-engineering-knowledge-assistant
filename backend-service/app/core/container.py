@@ -6,13 +6,17 @@ from app.embedding.embedding_client import OpenAIEmbeddingClient
 from app.embedding.embedding_service import EmbeddingService
 from app.rag.llm_client import LLMClient
 from app.rag.rag_service import RAGService
+from app.repositories.chunk_repository import ChunkRepository
 from app.repositories.mock_chunk_repository import MockChunkRepository
+from app.repositories.postgres_chunk_repository import (
+    PostgresChunkRepository,
+)
 from app.retrieval.retrieval_service import RetrievalService
 from app.web_search.serper_client import SerperClient
 
 
 class ServiceContainer:
-    """Create and hold shared application services."""
+    """Create and manage shared application services."""
 
     def __init__(
         self,
@@ -32,12 +36,16 @@ class ServiceContainer:
 
         # --------------------------------------------------------------
         # Repository
+        # Select the repository implementation based on configuration.
         # --------------------------------------------------------------
 
-        self.chunk_repository = MockChunkRepository()
+        self.chunk_repository = self._create_chunk_repository(
+            settings=settings,
+        )
 
         # --------------------------------------------------------------
         # Embedding
+        # Generate vector embeddings for user queries.
         # --------------------------------------------------------------
 
         self.embedding_client = OpenAIEmbeddingClient(
@@ -52,6 +60,7 @@ class ServiceContainer:
 
         # --------------------------------------------------------------
         # Retrieval
+        # Retrieve the most relevant document chunks.
         # --------------------------------------------------------------
 
         self.retrieval_service = RetrievalService(
@@ -60,7 +69,8 @@ class ServiceContainer:
         )
 
         # --------------------------------------------------------------
-        # LLM and RAG
+        # Large Language Model (LLM)
+        # Generate responses using retrieved context.
         # --------------------------------------------------------------
 
         self.llm_client = LLMClient(
@@ -75,7 +85,8 @@ class ServiceContainer:
         )
 
         # --------------------------------------------------------------
-        # Web search
+        # Web Search
+        # Used when retrieval confidence is below the threshold.
         # --------------------------------------------------------------
 
         self.serper_client = SerperClient(
@@ -84,6 +95,7 @@ class ServiceContainer:
 
         # --------------------------------------------------------------
         # Agent
+        # Orchestrates retrieval, RAG generation and web search.
         # --------------------------------------------------------------
 
         self.agent_service = AgentService(
@@ -99,7 +111,7 @@ class ServiceContainer:
         )
 
     async def close(self) -> None:
-        """Close shared asynchronous clients."""
+        """Release shared asynchronous resources."""
 
         await self.embedding_client.close()
         await self.serper_client.close()
@@ -109,7 +121,7 @@ class ServiceContainer:
         value: str | None,
         setting_name: str,
     ) -> str:
-        """Return a required setting or raise a clear startup error."""
+        """Return a required configuration value."""
 
         if value is None or not value.strip():
             raise RuntimeError(
@@ -118,3 +130,38 @@ class ServiceContainer:
             )
 
         return value.strip()
+
+    @staticmethod
+    def _create_chunk_repository(
+        settings: Settings,
+    ) -> ChunkRepository:
+        """
+        Create the configured chunk repository.
+
+        Supported repository types:
+        - memory: Mock repository for development and testing.
+        - postgres: PostgreSQL + pgvector repository.
+        """
+
+        repository_type = settings.repository_type.strip().lower()
+
+        if repository_type == "memory":
+            return MockChunkRepository()
+
+        if repository_type == "postgres":
+            if (
+                settings.database_url is None
+                or not settings.database_url.strip()
+            ):
+                raise RuntimeError(
+                    "DATABASE_URL must be configured when "
+                    "REPOSITORY_TYPE=postgres."
+                )
+
+            return PostgresChunkRepository()
+
+        raise RuntimeError(
+            "Unsupported REPOSITORY_TYPE: "
+            f"{settings.repository_type!r}. "
+            "Expected 'memory' or 'postgres'."
+        )
