@@ -472,6 +472,7 @@ class ChunkBuilder:
             file_type=file_type,
             extra=extra,
         )
+    
     def _split_oversized_element(
         self,
         element: StructuredElement,
