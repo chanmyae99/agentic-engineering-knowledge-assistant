@@ -77,6 +77,7 @@ class RAGService:
                     )
                 ),
                 page=chunk.metadata.get("page"),
+                location=self._build_source_location(chunk),
                 score=chunk.score,
             )
             for chunk in chunks
@@ -135,15 +136,15 @@ class RAGService:
 
         sources = [
             SourceReference(
-                document_name=str(
-                    chunk.metadata.get(
-                        "document_name",
-                        chunk.document_id,
-                    )
-                ),
-                page=chunk.metadata.get("page"),
-                score=chunk.score,
-            )
+            document_name=str(
+                chunk.metadata.get(
+                    "document_name",
+                    chunk.document_id,
+                )
+            ),
+            page=chunk.metadata.get("page"),
+            location=self._build_source_location(chunk),
+            score=chunk.score,)
             for chunk in chunks
         ]
 
@@ -154,3 +155,54 @@ class RAGService:
                 "retrieved_chunk_count": len(chunks),
             },
         )
+
+    @staticmethod
+    def _build_source_location(
+        chunk: RetrievedChunk,
+    ) -> str | None:
+        """
+        Build a readable source location.
+
+        PDF chunks use page numbers. DOCX chunks use the stored
+        section and paragraph range.
+        """
+        page = chunk.metadata.get("page")
+
+        if page is not None:
+            return f"Page {page}"
+
+        section = chunk.metadata.get("section")
+        paragraph_start = chunk.metadata.get("paragraph_start")
+        paragraph_end = chunk.metadata.get("paragraph_end")
+
+        if section and paragraph_start is not None:
+            if (
+                paragraph_end is not None
+                and paragraph_end != paragraph_start
+            ):
+                return (
+                    f"Section: {section}, "
+                    f"Paragraphs {paragraph_start}–{paragraph_end}"
+                )
+
+            return (
+                f"Section: {section}, "
+                f"Paragraph {paragraph_start}"
+            )
+
+        if section:
+            return f"Section: {section}"
+
+        if paragraph_start is not None:
+            if (
+                paragraph_end is not None
+                and paragraph_end != paragraph_start
+            ):
+                return (
+                    f"Paragraphs "
+                    f"{paragraph_start}–{paragraph_end}"
+                )
+
+            return f"Paragraph {paragraph_start}"
+
+        return None

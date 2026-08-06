@@ -99,11 +99,7 @@ class AgentService:
             AgentSource(
                 source_type="internal",
                 title=source.document_name,
-                location=(
-                    f"Page {source.page}"
-                    if source.page is not None
-                    else None
-                ),
+                location=source.location,
                 score=source.score,
             )
             for source in rag_response.sources
@@ -256,3 +252,54 @@ class AgentService:
         raise ValueError(
             "Unable to extract values from the embedding result."
         )
+
+    @staticmethod
+    def _build_internal_location(
+        *,
+        page: int | None,
+        metadata: dict,
+    ) -> str | None:
+        """
+        Build a human-readable source location.
+
+        PDFs use page numbers.
+        DOCX sources use section and paragraph ranges.
+        """
+        if page is not None:
+            return f"Page {page}"
+
+        section = metadata.get("section")
+        paragraph_start = metadata.get("paragraph_start")
+        paragraph_end = metadata.get("paragraph_end")
+
+        if section and paragraph_start is not None:
+            if (
+                paragraph_end is not None
+                and paragraph_end != paragraph_start
+            ):
+                return (
+                    f"Section: {section}, "
+                    f"Paragraphs {paragraph_start}–{paragraph_end}"
+                )
+
+            return (
+                f"Section: {section}, "
+                f"Paragraph {paragraph_start}"
+            )
+
+        if section:
+            return f"Section: {section}"
+
+        if paragraph_start is not None:
+            if (
+                paragraph_end is not None
+                and paragraph_end != paragraph_start
+            ):
+                return (
+                    f"Paragraphs "
+                    f"{paragraph_start}–{paragraph_end}"
+                )
+
+            return f"Paragraph {paragraph_start}"
+
+        return None

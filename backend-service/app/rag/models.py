@@ -8,6 +8,7 @@ class SourceReference(BaseModel):
 
     document_name: str
     page: int | None = None
+    location: str | None = None
     score: float
 
 

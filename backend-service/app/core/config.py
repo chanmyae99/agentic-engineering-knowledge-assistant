@@ -67,7 +67,7 @@ class Settings(BaseSettings):
     )
 
     retrieval_score_threshold: float = Field(
-        default=0.75,
+        default=0.50,
         alias="RETRIEVAL_SCORE_THRESHOLD",
     )
 

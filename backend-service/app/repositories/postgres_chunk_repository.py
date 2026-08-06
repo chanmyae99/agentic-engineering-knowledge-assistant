@@ -117,6 +117,9 @@ class PostgresChunkRepository(ChunkRepository):
             else {}
         )
 
+        page_start = metadata.get("page_start")
+        page_end = metadata.get("page_end")
+
         metadata.update(
             {
                 "document_name": row.get("file_name"),
@@ -124,6 +127,13 @@ class PostgresChunkRepository(ChunkRepository):
                 "content_type": row.get("content_type"),
                 "token_count": row.get("token_count"),
                 "section_path": row.get("section_path") or [],
+
+                # Keep the detailed page range.
+                "page_start": page_start,
+                "page_end": page_end,
+
+                # Compatibility field used by the current RAG source model.
+                "page": page_start,
             }
         )
 
