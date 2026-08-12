@@ -1,7 +1,15 @@
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob import BlobServiceClient, ContentSettings
 
 from app.storage.blob_storage import BlobStorage
+
+from datetime import datetime, timedelta, timezone
+
+from azure.storage.blob import (
+    BlobSasPermissions,
+    BlobServiceClient,
+    ContentSettings,
+    generate_blob_sas,
+)
 
 
 class AzureBlobStorage(BlobStorage):
@@ -100,3 +108,65 @@ class AzureBlobStorage(BlobStorage):
         )
 
         return blob_name
+
+
+    def generate_read_url(
+    self,
+    container_name: str,
+    blob_name: str,
+    expiry_minutes: int = 30,
+    ) -> str:
+        """
+        Generate a temporary read-only SAS URL for a stored blob.
+
+        The URL can be returned to the frontend so the image can be
+        displayed without exposing Azure Storage credentials.
+        """
+        if not container_name or not container_name.strip():
+            raise ValueError(
+                "container_name must not be empty."
+            )
+
+        if not blob_name or not blob_name.strip():
+            raise ValueError(
+                "blob_name must not be empty."
+            )
+
+        if expiry_minutes < 1:
+            raise ValueError(
+                "expiry_minutes must be at least 1."
+            )
+
+        credential = self._service_client.credential
+        account_key = getattr(
+            credential,
+            "account_key",
+            None,
+        )
+
+        if not account_key:
+            raise RuntimeError(
+                "Azure Storage account key is required "
+                "to generate a blob SAS URL."
+            )
+
+        sas_token = generate_blob_sas(
+            account_name=self._service_client.account_name,
+            container_name=container_name.strip(),
+            blob_name=blob_name.strip(),
+            account_key=account_key,
+            permission=BlobSasPermissions(
+                read=True,
+            ),
+            expiry=(
+                datetime.now(timezone.utc)
+                + timedelta(minutes=expiry_minutes)
+            ),
+        )
+
+        blob_client = self._service_client.get_blob_client(
+            container=container_name.strip(),
+            blob=blob_name.strip(),
+        )
+
+        return f"{blob_client.url}?{sas_token}"

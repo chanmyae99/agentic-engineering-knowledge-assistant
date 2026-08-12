@@ -13,6 +13,7 @@ from app.rag.rag_service import RAGService
 from app.retrieval.models import RetrievedChunk, RetrievedImage
 from app.retrieval.retrieval_service import RetrievalService
 from app.web_search.serper_client import SerperClient
+from app.storage.azure_blob_storage import AzureBlobStorage
 
 
 class AgentService:
@@ -37,6 +38,7 @@ class AgentService:
         rag_service: RAGService,
         serper_client: SerperClient,
         llm_client: LLMClient,
+        blob_storage: AzureBlobStorage,
         retrieval_score_threshold: float,
         web_top_k: int = 5,
         image_top_k: int = 3,
@@ -71,29 +73,22 @@ class AgentService:
             Maximum number of internal images returned with a RAG response.
         """
         if not 0.0 <= retrieval_score_threshold <= 1.0:
-            raise ValueError(
-                "retrieval_score_threshold must be between 0 and 1."
-            )
+            raise ValueError("retrieval_score_threshold must be between 0 and 1.")
 
         if web_top_k < 1:
-            raise ValueError(
-                "web_top_k must be at least 1."
-            )
+            raise ValueError("web_top_k must be at least 1.")
 
         if image_top_k < 1:
-            raise ValueError(
-                "image_top_k must be at least 1."
-            )
+            raise ValueError("image_top_k must be at least 1.")
 
         self._embedding_service = embedding_service
         self._retrieval_service = retrieval_service
         self._rag_service = rag_service
         self._serper_client = serper_client
         self._llm_client = llm_client
+        self._blob_storage = blob_storage
 
-        self._retrieval_score_threshold = (
-            retrieval_score_threshold
-        )
+        self._retrieval_score_threshold = retrieval_score_threshold
         self._web_top_k = web_top_k
         self._image_top_k = image_top_k
 
@@ -113,24 +108,16 @@ class AgentService:
         5. Use internal RAG when confidence is sufficient.
         6. Otherwise, fall back to web search.
         """
-        cleaned_question = self._validate_question(
-            question
-        )
+        cleaned_question = self._validate_question(question)
 
         # ----------------------------------------------------------
         # Generate one query embedding that can be reused for both
         # text retrieval and image-caption retrieval.
         # ----------------------------------------------------------
 
-        query_embedding = (
-            await self._embedding_service.embed_query(
-                cleaned_question
-            )
-        )
+        query_embedding = await self._embedding_service.embed_query(cleaned_question)
 
-        embedding_values = self._extract_embedding_values(
-            query_embedding
-        )
+        embedding_values = self._extract_embedding_values(query_embedding)
 
         # ----------------------------------------------------------
         # Retrieve relevant internal text chunks.
@@ -141,9 +128,7 @@ class AgentService:
             query_embedding=embedding_values,
         )
 
-        highest_score = self._get_highest_score(
-            chunks
-        )
+        highest_score = self._get_highest_score(chunks)
 
         # ----------------------------------------------------------
         # Internal route
@@ -157,11 +142,9 @@ class AgentService:
             chunks=chunks,
             highest_score=highest_score,
         ):
-            images = (
-                self._retrieval_service.retrieve_images(
-                    query_embedding=embedding_values,
-                    top_k=self._image_top_k,
-                )
+            images = self._retrieval_service.retrieve_images(
+                query_embedding=embedding_values,
+                top_k=self._image_top_k,
             )
 
             return await self._answer_from_internal_documents(
@@ -175,9 +158,7 @@ class AgentService:
         # Web fallback route
         # ----------------------------------------------------------
 
-        route_reason = self._get_web_route_reason(
-            chunks
-        )
+        route_reason = self._get_web_route_reason(chunks)
 
         return await self._answer_from_web(
             question=cleaned_question,
@@ -200,11 +181,9 @@ class AgentService:
         Retrieved images are returned as supporting visual context for the
         frontend.
         """
-        rag_response = (
-            await self._rag_service.answer_from_chunks(
-                question=question,
-                chunks=chunks,
-            )
+        rag_response = await self._rag_service.answer_from_chunks(
+            question=question,
+            chunks=chunks,
         )
 
         sources = [
@@ -219,6 +198,7 @@ class AgentService:
 
         agent_images = [
             AgentImage(
+                image_id=image.image_id,
                 document_name=str(
                     image.metadata.get(
                         "document_name",
@@ -231,6 +211,11 @@ class AgentService:
                 image_container=image.image_container,
                 image_blob_name=image.image_blob_name,
                 image_file_name=image.image_file_name,
+                image_url=self._blob_storage.generate_read_url(
+                    container_name=image.image_container,
+                    blob_name=image.image_blob_name,
+                    expiry_minutes=30,
+                ),
             )
             for image in images
         ]
@@ -241,15 +226,11 @@ class AgentService:
             sources=sources,
             images=agent_images,
             metadata={
-                "route_reason": (
-                    "retrieval_score_met_threshold"
-                ),
+                "route_reason": ("retrieval_score_met_threshold"),
                 "highest_retrieval_score": highest_score,
                 "retrieved_chunk_count": len(chunks),
                 "retrieved_image_count": len(images),
-                "retrieval_threshold": (
-                    self._retrieval_score_threshold
-                ),
+                "retrieval_threshold": (self._retrieval_score_threshold),
             },
         )
 
@@ -283,15 +264,9 @@ class AgentService:
                 images=[],
                 metadata={
                     "route_reason": route_reason,
-                    "highest_retrieval_score": (
-                        highest_score
-                    ),
-                    "retrieved_chunk_count": (
-                        retrieved_chunk_count
-                    ),
-                    "retrieval_threshold": (
-                        self._retrieval_score_threshold
-                    ),
+                    "highest_retrieval_score": (highest_score),
+                    "retrieved_chunk_count": (retrieved_chunk_count),
+                    "retrieval_threshold": (self._retrieval_score_threshold),
                     "web_result_count": 0,
                 },
             )
@@ -301,9 +276,7 @@ class AgentService:
             results=web_response.results,
         )
 
-        answer = await self._llm_client.generate(
-            prompt
-        )
+        answer = await self._llm_client.generate(prompt)
 
         sources = [
             AgentSource(
@@ -321,18 +294,10 @@ class AgentService:
             images=[],
             metadata={
                 "route_reason": route_reason,
-                "highest_retrieval_score": (
-                    highest_score
-                ),
-                "retrieved_chunk_count": (
-                    retrieved_chunk_count
-                ),
-                "retrieval_threshold": (
-                    self._retrieval_score_threshold
-                ),
-                "web_result_count": len(
-                    web_response.results
-                ),
+                "highest_retrieval_score": (highest_score),
+                "retrieved_chunk_count": (retrieved_chunk_count),
+                "retrieval_threshold": (self._retrieval_score_threshold),
+                "web_result_count": len(web_response.results),
             },
         )
 
@@ -347,10 +312,7 @@ class AgentService:
         if not chunks:
             return False
 
-        return (
-            highest_score
-            >= self._retrieval_score_threshold
-        )
+        return highest_score >= self._retrieval_score_threshold
 
     @staticmethod
     def _get_highest_score(
@@ -364,10 +326,7 @@ class AgentService:
         if not chunks:
             return 0.0
 
-        return max(
-            chunk.score
-            for chunk in chunks
-        )
+        return max(chunk.score for chunk in chunks)
 
     @staticmethod
     def _get_web_route_reason(
@@ -388,13 +347,8 @@ class AgentService:
         """
         Validate and normalize a user question.
         """
-        if (
-            not isinstance(question, str)
-            or not question.strip()
-        ):
-            raise EmptyQuestionError(
-                "Question must not be empty."
-            )
+        if not isinstance(question, str) or not question.strip():
+            raise EmptyQuestionError("Question must not be empty.")
 
         return question.strip()
 
@@ -422,9 +376,7 @@ class AgentService:
             if values is not None:
                 return list(values)
 
-        raise ValueError(
-            "Unable to extract values from the embedding result."
-        )
+        raise ValueError("Unable to extract values from the embedding result.")
 
     @staticmethod
     def _build_internal_location(
@@ -444,47 +396,26 @@ class AgentService:
             return f"Page {page}"
 
         section = metadata.get("section")
-        paragraph_start = metadata.get(
-            "paragraph_start"
-        )
-        paragraph_end = metadata.get(
-            "paragraph_end"
-        )
+        paragraph_start = metadata.get("paragraph_start")
+        paragraph_end = metadata.get("paragraph_end")
 
-        if (
-            section
-            and paragraph_start is not None
-        ):
-            if (
-                paragraph_end is not None
-                and paragraph_end != paragraph_start
-            ):
+        if section and paragraph_start is not None:
+            if paragraph_end is not None and paragraph_end != paragraph_start:
                 return (
                     f"Section: {section}, "
                     f"Paragraphs "
                     f"{paragraph_start}–{paragraph_end}"
                 )
 
-            return (
-                f"Section: {section}, "
-                f"Paragraph {paragraph_start}"
-            )
+            return f"Section: {section}, " f"Paragraph {paragraph_start}"
 
         if section:
             return f"Section: {section}"
 
         if paragraph_start is not None:
-            if (
-                paragraph_end is not None
-                and paragraph_end != paragraph_start
-            ):
-                return (
-                    f"Paragraphs "
-                    f"{paragraph_start}–{paragraph_end}"
-                )
+            if paragraph_end is not None and paragraph_end != paragraph_start:
+                return f"Paragraphs " f"{paragraph_start}–{paragraph_end}"
 
-            return (
-                f"Paragraph {paragraph_start}"
-            )
+            return f"Paragraph {paragraph_start}"
 
         return None

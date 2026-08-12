@@ -20,6 +20,7 @@ from app.repositories.postgres_image_repository import (
     PostgresImageRepository,
 )
 from app.chunking.chunking_service import ChunkingService
+from app.storage.azure_blob_storage import AzureBlobStorage
 
 
 class ServiceContainer:
@@ -112,6 +113,21 @@ class ServiceContainer:
         )
 
         # --------------------------------------------------------------
+        # Azure Blob Storage
+        # Connect to azure blob storage
+        # --------------------------------------------------------------
+
+
+        azure_connection_string = self._require_setting(
+            value=settings.azure_storage_connection_string,
+            setting_name="AZURE_STORAGE_CONNECTION_STRING",
+        )
+
+        self.blob_storage = AzureBlobStorage(
+            connection_string=azure_connection_string,
+        )
+
+        # --------------------------------------------------------------
         # Agent
         # Orchestrates retrieval, RAG generation and web search.
         # --------------------------------------------------------------
@@ -122,6 +138,7 @@ class ServiceContainer:
             rag_service=self.rag_service,
             serper_client=self.serper_client,
             llm_client=self.llm_client,
+            blob_storage=self.blob_storage,
             retrieval_score_threshold=(settings.retrieval_score_threshold),
             web_top_k=settings.web_search_top_k,
         )

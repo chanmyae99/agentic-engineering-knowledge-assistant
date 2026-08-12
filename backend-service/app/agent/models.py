@@ -20,6 +20,8 @@ class AgentSource(BaseModel):
 class AgentImage(BaseModel):
     """One image retrieved from the internal knowledge base."""
 
+    image_id: str
+
     document_name: str
 
     page: int | None = None
@@ -33,6 +35,8 @@ class AgentImage(BaseModel):
     image_blob_name: str
 
     image_file_name: str
+
+    image_url: str | None = None
 
 
 class AgentResponse(BaseModel):
