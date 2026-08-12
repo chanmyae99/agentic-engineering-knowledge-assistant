@@ -16,7 +16,11 @@ from app.web_search.serper_client import SerperClient
 from app.repositories.postgres_ingestion_repository import (
     PostgresIngestionRepository,
 )
+from app.repositories.postgres_image_repository import (
+    PostgresImageRepository,
+)
 from app.chunking.chunking_service import ChunkingService
+
 
 class ServiceContainer:
     """Create and manage shared application services."""
@@ -47,6 +51,7 @@ class ServiceContainer:
         )
 
         self.ingestion_repository = PostgresIngestionRepository()
+        self.image_repository = PostgresImageRepository()
 
         # --------------------------------------------------------------
         # Chunking
@@ -72,11 +77,12 @@ class ServiceContainer:
 
         # --------------------------------------------------------------
         # Retrieval
-        # Retrieve the most relevant chunks from the configured store.
+        # Retrieve the most relevant chunks and image from the configured store.
         # --------------------------------------------------------------
 
         self.retrieval_service = RetrievalService(
             chunk_repository=self.chunk_repository,
+            image_repository=self.image_repository,
             top_k=settings.top_k,
         )
 
@@ -116,9 +122,7 @@ class ServiceContainer:
             rag_service=self.rag_service,
             serper_client=self.serper_client,
             llm_client=self.llm_client,
-            retrieval_score_threshold=(
-                settings.retrieval_score_threshold
-            ),
+            retrieval_score_threshold=(settings.retrieval_score_threshold),
             web_top_k=settings.web_search_top_k,
         )
 
@@ -137,8 +141,7 @@ class ServiceContainer:
 
         if value is None or not value.strip():
             raise RuntimeError(
-                f"{setting_name} must be configured before "
-                "starting the application."
+                f"{setting_name} must be configured before " "starting the application."
             )
 
         return value.strip()
@@ -161,13 +164,9 @@ class ServiceContainer:
             return MockChunkRepository()
 
         if repository_type == "postgres":
-            if (
-                settings.database_url is None
-                or not settings.database_url.strip()
-            ):
+            if settings.database_url is None or not settings.database_url.strip():
                 raise RuntimeError(
-                    "DATABASE_URL must be configured when "
-                    "REPOSITORY_TYPE=postgres."
+                    "DATABASE_URL must be configured when " "REPOSITORY_TYPE=postgres."
                 )
 
             return PostgresChunkRepository()

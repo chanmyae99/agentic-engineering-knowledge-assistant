@@ -1,18 +1,34 @@
 from __future__ import annotations
 
 from app.agent.exceptions import EmptyQuestionError
-from app.agent.models import AgentResponse, AgentSource
+from app.agent.models import (
+    AgentImage,
+    AgentResponse,
+    AgentSource,
+)
 from app.agent.prompt_builder import AgentPromptBuilder
 from app.embedding.embedding_service import EmbeddingService
 from app.rag.llm_client import LLMClient
 from app.rag.rag_service import RAGService
-from app.retrieval.models import RetrievedChunk
+from app.retrieval.models import RetrievedChunk, RetrievedImage
 from app.retrieval.retrieval_service import RetrievalService
 from app.web_search.serper_client import SerperClient
 
 
 class AgentService:
-    """Route questions between internal RAG and web search."""
+    """
+    Orchestrate question answering across internal RAG and web search.
+
+    The agent first embeds the user question and performs internal retrieval.
+    If the retrieved text chunks meet the configured relevance threshold,
+    the request is answered using the internal RAG pipeline.
+
+    Relevant document images are also retrieved using image-caption
+    embeddings and returned together with the internal answer.
+
+    If internal retrieval confidence is insufficient, the agent falls back
+    to web search using Serper.
+    """
 
     def __init__(
         self,
@@ -23,57 +39,145 @@ class AgentService:
         llm_client: LLMClient,
         retrieval_score_threshold: float,
         web_top_k: int = 5,
+        image_top_k: int = 3,
     ) -> None:
+        """
+        Initialize the agent and its dependencies.
+
+        Parameters
+        ----------
+        embedding_service:
+            Generates embeddings for user queries.
+
+        retrieval_service:
+            Retrieves relevant internal text chunks and images.
+
+        rag_service:
+            Produces answers grounded in retrieved internal text.
+
+        serper_client:
+            Performs external web search when internal retrieval is weak.
+
+        llm_client:
+            Generates responses from web-search context.
+
+        retrieval_score_threshold:
+            Minimum text-retrieval score required to use the internal route.
+
+        web_top_k:
+            Maximum number of web results used for fallback generation.
+
+        image_top_k:
+            Maximum number of internal images returned with a RAG response.
+        """
         if not 0.0 <= retrieval_score_threshold <= 1.0:
             raise ValueError(
                 "retrieval_score_threshold must be between 0 and 1."
             )
 
         if web_top_k < 1:
-            raise ValueError("web_top_k must be at least 1.")
+            raise ValueError(
+                "web_top_k must be at least 1."
+            )
+
+        if image_top_k < 1:
+            raise ValueError(
+                "image_top_k must be at least 1."
+            )
 
         self._embedding_service = embedding_service
         self._retrieval_service = retrieval_service
         self._rag_service = rag_service
         self._serper_client = serper_client
         self._llm_client = llm_client
-        self._retrieval_score_threshold = retrieval_score_threshold
+
+        self._retrieval_score_threshold = (
+            retrieval_score_threshold
+        )
         self._web_top_k = web_top_k
+        self._image_top_k = image_top_k
 
     async def answer(
         self,
         question: str,
     ) -> AgentResponse:
-        """Answer using internal documents or web-search fallback."""
+        """
+        Answer a user question using internal RAG or web fallback.
 
-        cleaned_question = self._validate_question(question)
+        Processing flow
+        ---------------
+        1. Validate the user question.
+        2. Generate a query embedding.
+        3. Retrieve relevant internal text chunks.
+        4. Evaluate the highest retrieval score.
+        5. Use internal RAG when confidence is sufficient.
+        6. Otherwise, fall back to web search.
+        """
+        cleaned_question = self._validate_question(
+            question
+        )
 
-        query_embedding = await self._embedding_service.embed_query(
-            cleaned_question
+        # ----------------------------------------------------------
+        # Generate one query embedding that can be reused for both
+        # text retrieval and image-caption retrieval.
+        # ----------------------------------------------------------
+
+        query_embedding = (
+            await self._embedding_service.embed_query(
+                cleaned_question
+            )
         )
 
         embedding_values = self._extract_embedding_values(
             query_embedding
         )
 
+        # ----------------------------------------------------------
+        # Retrieve relevant internal text chunks.
+        # ----------------------------------------------------------
+
         chunks = self._retrieval_service.retrieve(
             query_text=cleaned_question,
             query_embedding=embedding_values,
         )
 
-        highest_score = self._get_highest_score(chunks)
+        highest_score = self._get_highest_score(
+            chunks
+        )
+
+        # ----------------------------------------------------------
+        # Internal route
+        #
+        # Image retrieval is only performed after the text route has
+        # been accepted. This prevents unrelated image results from
+        # being returned when the request should fall back to web.
+        # ----------------------------------------------------------
 
         if self._should_use_internal_route(
             chunks=chunks,
             highest_score=highest_score,
         ):
+            images = (
+                self._retrieval_service.retrieve_images(
+                    query_embedding=embedding_values,
+                    top_k=self._image_top_k,
+                )
+            )
+
             return await self._answer_from_internal_documents(
                 question=cleaned_question,
                 chunks=chunks,
+                images=images,
                 highest_score=highest_score,
             )
 
-        route_reason = self._get_web_route_reason(chunks)
+        # ----------------------------------------------------------
+        # Web fallback route
+        # ----------------------------------------------------------
+
+        route_reason = self._get_web_route_reason(
+            chunks
+        )
 
         return await self._answer_from_web(
             question=cleaned_question,
@@ -86,13 +190,21 @@ class AgentService:
         self,
         question: str,
         chunks: list[RetrievedChunk],
+        images: list[RetrievedImage],
         highest_score: float,
     ) -> AgentResponse:
-        """Generate an answer using retrieved internal chunks."""
+        """
+        Generate an answer grounded in internal document chunks.
 
-        rag_response = await self._rag_service.answer_from_chunks(
-            question=question,
-            chunks=chunks,
+        Text chunks are passed to the RAG service for answer generation.
+        Retrieved images are returned as supporting visual context for the
+        frontend.
+        """
+        rag_response = (
+            await self._rag_service.answer_from_chunks(
+                question=question,
+                chunks=chunks,
+            )
         )
 
         sources = [
@@ -105,14 +217,36 @@ class AgentService:
             for source in rag_response.sources
         ]
 
+        agent_images = [
+            AgentImage(
+                document_name=str(
+                    image.metadata.get(
+                        "document_name",
+                        image.document_id,
+                    )
+                ),
+                page=image.metadata.get("page"),
+                caption=image.caption,
+                score=image.score,
+                image_container=image.image_container,
+                image_blob_name=image.image_blob_name,
+                image_file_name=image.image_file_name,
+            )
+            for image in images
+        ]
+
         return AgentResponse(
             answer=rag_response.answer,
             route="internal",
             sources=sources,
+            images=agent_images,
             metadata={
-                "route_reason": "retrieval_score_met_threshold",
+                "route_reason": (
+                    "retrieval_score_met_threshold"
+                ),
                 "highest_retrieval_score": highest_score,
                 "retrieved_chunk_count": len(chunks),
+                "retrieved_image_count": len(images),
                 "retrieval_threshold": (
                     self._retrieval_score_threshold
                 ),
@@ -126,8 +260,12 @@ class AgentService:
         retrieved_chunk_count: int,
         route_reason: str,
     ) -> AgentResponse:
-        """Generate an answer using Serper web-search results."""
+        """
+        Generate an answer from Serper web-search results.
 
+        This route is used when internal retrieval does not meet the
+        configured relevance threshold.
+        """
         web_response = await self._serper_client.search(
             query=question,
             top_k=self._web_top_k,
@@ -142,10 +280,15 @@ class AgentService:
                 ),
                 route="unavailable",
                 sources=[],
+                images=[],
                 metadata={
                     "route_reason": route_reason,
-                    "highest_retrieval_score": highest_score,
-                    "retrieved_chunk_count": retrieved_chunk_count,
+                    "highest_retrieval_score": (
+                        highest_score
+                    ),
+                    "retrieved_chunk_count": (
+                        retrieved_chunk_count
+                    ),
                     "retrieval_threshold": (
                         self._retrieval_score_threshold
                     ),
@@ -158,7 +301,9 @@ class AgentService:
             results=web_response.results,
         )
 
-        answer = await self._llm_client.generate(prompt)
+        answer = await self._llm_client.generate(
+            prompt
+        )
 
         sources = [
             AgentSource(
@@ -173,14 +318,21 @@ class AgentService:
             answer=answer,
             route="web",
             sources=sources,
+            images=[],
             metadata={
                 "route_reason": route_reason,
-                "highest_retrieval_score": highest_score,
-                "retrieved_chunk_count": retrieved_chunk_count,
+                "highest_retrieval_score": (
+                    highest_score
+                ),
+                "retrieved_chunk_count": (
+                    retrieved_chunk_count
+                ),
                 "retrieval_threshold": (
                     self._retrieval_score_threshold
                 ),
-                "web_result_count": len(web_response.results),
+                "web_result_count": len(
+                    web_response.results
+                ),
             },
         )
 
@@ -189,30 +341,41 @@ class AgentService:
         chunks: list[RetrievedChunk],
         highest_score: float,
     ) -> bool:
-        """Return True when internal retrieval is sufficiently relevant."""
-
+        """
+        Determine whether internal retrieval is sufficiently relevant.
+        """
         if not chunks:
             return False
 
-        return highest_score >= self._retrieval_score_threshold
+        return (
+            highest_score
+            >= self._retrieval_score_threshold
+        )
 
     @staticmethod
     def _get_highest_score(
         chunks: list[RetrievedChunk],
     ) -> float:
-        """Return the highest retrieval score, or zero when empty."""
+        """
+        Return the highest retrieved chunk score.
 
+        Empty retrieval results return zero.
+        """
         if not chunks:
             return 0.0
 
-        return max(chunk.score for chunk in chunks)
+        return max(
+            chunk.score
+            for chunk in chunks
+        )
 
     @staticmethod
     def _get_web_route_reason(
         chunks: list[RetrievedChunk],
     ) -> str:
-        """Explain why the request was routed to web search."""
-
+        """
+        Describe why the question was routed to web search.
+        """
         if not chunks:
             return "no_chunks_retrieved"
 
@@ -222,10 +385,16 @@ class AgentService:
     def _validate_question(
         question: str,
     ) -> str:
-        """Validate and normalize a user question."""
-
-        if not isinstance(question, str) or not question.strip():
-            raise EmptyQuestionError("Question must not be empty.")
+        """
+        Validate and normalize a user question.
+        """
+        if (
+            not isinstance(question, str)
+            or not question.strip()
+        ):
+            raise EmptyQuestionError(
+                "Question must not be empty."
+            )
 
         return question.strip()
 
@@ -233,8 +402,12 @@ class AgentService:
     def _extract_embedding_values(
         embedding: object,
     ) -> list[float]:
-        """Extract vector values from the embedding response model."""
+        """
+        Extract vector values from the embedding response model.
 
+        Several field names are supported to remain compatible with
+        different embedding model representations.
+        """
         for attribute_name in (
             "values",
             "embedding",
@@ -260,26 +433,36 @@ class AgentService:
         metadata: dict,
     ) -> str | None:
         """
-        Build a human-readable source location.
+        Build a human-readable internal source location.
 
-        PDFs use page numbers.
-        DOCX sources use section and paragraph ranges.
+        PDF sources use page numbers.
+
+        DOCX sources use their section and paragraph range because Word
+        document page numbers are not stable across different renderers.
         """
         if page is not None:
             return f"Page {page}"
 
         section = metadata.get("section")
-        paragraph_start = metadata.get("paragraph_start")
-        paragraph_end = metadata.get("paragraph_end")
+        paragraph_start = metadata.get(
+            "paragraph_start"
+        )
+        paragraph_end = metadata.get(
+            "paragraph_end"
+        )
 
-        if section and paragraph_start is not None:
+        if (
+            section
+            and paragraph_start is not None
+        ):
             if (
                 paragraph_end is not None
                 and paragraph_end != paragraph_start
             ):
                 return (
                     f"Section: {section}, "
-                    f"Paragraphs {paragraph_start}–{paragraph_end}"
+                    f"Paragraphs "
+                    f"{paragraph_start}–{paragraph_end}"
                 )
 
             return (
@@ -300,6 +483,8 @@ class AgentService:
                     f"{paragraph_start}–{paragraph_end}"
                 )
 
-            return f"Paragraph {paragraph_start}"
+            return (
+                f"Paragraph {paragraph_start}"
+            )
 
         return None
