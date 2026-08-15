@@ -1,5 +1,7 @@
 import streamlit as st
 
+from api_client import BackendError, ask_backend
+
 
 st.set_page_config(
     page_title="Engineering Knowledge Assistant",
@@ -36,8 +38,8 @@ with st.sidebar:
 
     st.divider()
 
-    st.caption("Backend status")
-    st.success("Frontend ready")
+    st.caption("Service configuration")
+    st.info("Backend: http://127.0.0.1:8000")
 
     st.divider()
 
@@ -105,31 +107,41 @@ for message in st.session_state.messages:
 prompt = st.chat_input("Ask an engineering or safety question...")
 
 if prompt:
-    # Save user message
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": prompt,
-        }
-    )
+    # Save and display the user message
+    user_message = {
+        "role": "user",
+        "content": prompt,
+    }
 
-    # Display user message
+    st.session_state.messages.append(user_message)
+
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Temporary fake assistant response
-    # Backend connection comes in Sprint 3
-    fake_answer = (
-        "The frontend chat interface is working. "
-        "In the next sprint, this message will come from the FastAPI backend."
-    )
-
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": fake_answer,
-        }
-    )
-
+    # Ask the existing FastAPI backend
     with st.chat_message("assistant"):
-        st.markdown(fake_answer)
+        with st.spinner("Searching engineering knowledge..."):
+            try:
+                result = ask_backend(prompt)
+
+                answer = result.get(
+                    "answer",
+                    "I could not generate an answer.",
+                )
+
+                st.markdown(answer)
+
+                assistant_message = {
+                    "role": "assistant",
+                    "content": answer,
+                    "route": result.get("route"),
+                    "sources": result.get("sources", []),
+                    "images": result.get("images", []),
+                }
+
+                st.session_state.messages.append(
+                    assistant_message
+                )
+
+            except BackendError as error:
+                st.error(str(error))
