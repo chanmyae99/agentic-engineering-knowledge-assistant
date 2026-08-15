@@ -113,6 +113,46 @@ def render_sources(sources: list) -> None:
                 st.divider()
 
 
+def render_images(images: list) -> None:
+    """Display up to 2 relevant document images returned by the backend."""
+
+    if not images:
+        return
+
+    visible_images = images[:2]
+
+    st.caption("Related document images")
+
+    for image in visible_images:
+        image_url = image.get("image_url")
+        document_name = image.get(
+            "document_name",
+            "Source document",
+        )
+        page = image.get("page")
+        image_caption = image.get("caption")
+
+        if page:
+            source_caption = f"{document_name} — Page {page}"
+        else:
+            source_caption = document_name
+
+        if image_url:
+            try:
+                st.image(
+                    image_url,
+                    caption=source_caption,
+                    width="stretch",
+                )
+            except Exception:
+                st.caption("Image currently unavailable.")
+        else:
+            st.caption("Image currently unavailable.")
+
+        if image_caption:
+            with st.expander("Image details"):
+                st.write(image_caption)
+
 # =========================================================
 # Sidebar
 # =========================================================
@@ -363,7 +403,9 @@ if prompt:
             # Sources
             # ---------------------------------
 
+            render_images(images)
             render_sources(sources)
+            
 
             # ---------------------------------
             # Save assistant message
