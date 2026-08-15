@@ -1,0 +1,149 @@
+[
+  {
+    "question": "What is combustible dust?",
+    "reference": "Combustible dust is a finely divided combustible particulate solid that can create a flash fire or explosion hazard when suspended in air under suitable conditions.",
+    "answer": "Combustible dust refers to any finely divided combustible particulate solid—regardless of size, shape, or chemical composition—that, when processed, stored, or handled in a facility, presents a flash fire hazard or an explosion hazard when suspended in air or a process-specific oxidising medium over a range of concentrations. When such dust is suspended at an optimal concentration in air under specific conditions, it can ignite and cause rapid burning or explosive incidents.",
+    "route": "internal",
+    "sources": [
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 1",
+        "url": null,
+        "score": 0.7116471704688394
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 8",
+        "url": null,
+        "score": 0.6975153841794461
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 6",
+        "url": null,
+        "score": 0.69461279391864
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 14",
+        "url": null,
+        "score": 0.6874792965163957
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 31",
+        "url": null,
+        "score": 0.6761974415497486
+      }
+    ],
+    "metadata": {
+      "route_reason": "retrieval_score_met_threshold",
+      "highest_retrieval_score": 0.7116471704688394,
+      "retrieved_chunk_count": 5,
+      "retrieval_threshold": 0.0
+    }
+  },
+  {
+    "question": "What elements are required for a combustible dust explosion?",
+    "reference": "The five elements are combustible dust as fuel, oxygen, an ignition source, dispersion of dust in air, and confinement.",
+    "answer": "The elements required for a combustible dust explosion, collectively known as the dust explosion pentagon, are:\n\n1. **Fuel** – combustible dust particles suspended in air.\n2. **Oxygen** – present in the air to support combustion.\n3. **Ignition source** – an energy source sufficient to ignite the dust particles (e.g., naked flames, sparks, static electricity, hot surfaces).\n4. **Dispersion** – the dust must be suspended in air, forming a dust cloud at or above the minimum explosible concentration.\n5. **Confinement** – the dust cloud must be within an enclosed or semi-enclosed space that allows pressure build-up.\n\nAll five elements must coexist for a combustible dust explosion to occur.",
+    "route": "internal",
+    "sources": [
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 6",
+        "url": null,
+        "score": 0.608677528142109
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 8",
+        "url": null,
+        "score": 0.5762169268722815
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 17",
+        "url": null,
+        "score": 0.4998401600183829
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 1",
+        "url": null,
+        "score": 0.48396868498802
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 10",
+        "url": null,
+        "score": 0.48365801394009544
+      }
+    ],
+    "metadata": {
+      "route_reason": "retrieval_score_met_threshold",
+      "highest_retrieval_score": 0.608677528142109,
+      "retrieved_chunk_count": 5,
+      "retrieval_threshold": 0.0
+    }
+  },
+  {
+    "question": "What are some ways to control combustible dust hazards?",
+    "reference": "Controls include reducing dust generation and accumulation, effective extraction and collection, good housekeeping, controlling ignition sources, and appropriate explosion prevention and protection measures.",
+    "answer": "Some effective ways to control combustible dust hazards include:\n\n1. **Elimination**  \n   - Remove the combustible dust hazard entirely from the process or workplace, for example by avoiding the use of combustible dust materials when possible.\n\n2. **Substitution**  \n   - Replace combustible dust materials with less hazardous alternatives, such as using materials in pellet, paste, or slurry form instead of powder.\n\n3. **Engineering Controls**  \n   - Use physical means to reduce dust explosion risk, including:  \n     - Local exhaust ventilation and dust collection systems to prevent dust accumulation and capture dust at the source.  \n     - Equipment designed to avoid ignition sources, including bonding and grounding to prevent electrostatic sparks.  \n     - Conduct Hazardous Area Classification (HAC) to identify locations where dust clouds may form and install suitable explosion-proof or non-sparking equipment.  \n     - Install ignition control measures such as spark detection systems and use non-sparking tools.  \n     - Use explosion suppression systems that detect pressure or heat and automatically inject suppressants to limit explosions.  \n     - Use dust suppression systems, such as liquid mist sprays, to prevent dust from becoming airborne.\n\n4. **Administrative Controls**  \n   - Establish safe work procedures including no smoking policies in dust areas.  \n   - Conduct regular cleaning with appropriate methods (e.g., wet cleaning or explosion-proof vacuum cleaners) to prevent dust accumulation.  \n   - Train workers on combustible dust hazards, safe handling, and housekeeping.  \n   - Implement emergency response plans with regular drills.\n\n5. **Personal Protective Equipment (PPE)**  \n   - Equip workers with flame retardant clothing, static dissipative safety shoes, and dust respirators.  \n   - Conduct fit testing and fit checks for respiratory protection.\n\nThese controls are most effective when applied following the Hierarchy of Control, starting with elimination and substitution before applying engineering, administrative controls, and PPE in combination as needed.",
+    "route": "internal",
+    "sources": [
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 14",
+        "url": null,
+        "score": 0.614686950928568
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 16",
+        "url": null,
+        "score": 0.6135394721538647
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 21",
+        "url": null,
+        "score": 0.5656524452684218
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 31",
+        "url": null,
+        "score": 0.5594022189412419
+      },
+      {
+        "source_type": "internal",
+        "title": "combustible-dust-guidelines-2025.pdf",
+        "location": "Page 17",
+        "url": null,
+        "score": 0.5541883595296365
+      }
+    ],
+    "metadata": {
+      "route_reason": "retrieval_score_met_threshold",
+      "highest_retrieval_score": 0.614686950928568,
+      "retrieved_chunk_count": 5,
+      "retrieval_threshold": 0.0
+    }
+  }
+]

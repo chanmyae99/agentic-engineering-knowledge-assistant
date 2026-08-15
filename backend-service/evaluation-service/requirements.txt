@@ -1,0 +1,6 @@
+ragas
+datasets
+pandas
+openai
+python-dotenv
+requests
