@@ -1,0 +1,5 @@
+metric,score
+Routing Accuracy,1.0
+Context Precision,0.9351
+Context Recall,0.9841
+Faithfulness,0.9613

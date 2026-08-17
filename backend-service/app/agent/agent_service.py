@@ -1,4 +1,5 @@
 from __future__ import annotations
+from urllib import response
 
 from app.agent.exceptions import EmptyQuestionError
 from app.agent.models import (
@@ -166,6 +167,82 @@ class AgentService:
             retrieved_chunk_count=len(chunks),
             route_reason=route_reason,
         )
+        
+    async def evaluate_query(
+        self,
+        question: str,
+    ) -> tuple[AgentResponse, list[RetrievedChunk]]:
+        """
+        Run the normal RAG retrieval pipeline for evaluation.
+
+        In addition to the generated response, this method returns
+        the retrieved text chunks so evaluation frameworks such as
+        RAGAS can assess retrieval quality and answer faithfulness.
+
+        Image retrieval is intentionally excluded because the current
+        evaluation focuses on text-based RAG performance.
+        """
+
+        cleaned_question = self._validate_question(
+        question
+        )
+
+        # Generate an embedding for the evaluation question.
+        query_embedding = (
+            await self._embedding_service.embed_query(
+            cleaned_question
+            )
+        )
+
+        embedding_values = self._extract_embedding_values(
+            query_embedding
+        )
+
+        # Retrieve the same document chunks used by the RAG pipeline.
+        chunks = self._retrieval_service.retrieve(
+            query_text=cleaned_question,
+            query_embedding=embedding_values,
+        )
+
+        highest_score = self._get_highest_score(
+            chunks
+        )
+
+        # Use internal RAG when the retrieved chunks satisfy
+        # the configured retrieval threshold.
+        if self._should_use_internal_route(
+            chunks=chunks,
+            highest_score=highest_score,
+        ):
+            images = self._retrieval_service.retrieve_images(
+                query_embedding=embedding_values,
+            )
+
+            response = (
+                await self._answer_from_internal_documents(
+                    question=cleaned_question,
+                    chunks=chunks,
+                    images=images,
+                    highest_score=highest_score,
+                )
+            )
+
+            return response, chunks
+
+        # Otherwise use the existing web-search fallback.
+        route_reason = self._get_web_route_reason(
+            chunks
+        )
+
+        response = await self._answer_from_web(
+            question=cleaned_question,
+            highest_score=highest_score,
+            retrieved_chunk_count=len(chunks),
+            route_reason=route_reason,
+        )
+
+        return response, chunks
+
 
     async def _answer_from_internal_documents(
         self,

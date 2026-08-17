@@ -1,0 +1,152 @@
+[
+  {
+    "question": "How can Model-Based Systems Engineering be used to analyse Standard Operating Procedures?",
+    "reference": "SOPs can be modelled using LML/SysML Action or Activity Diagrams in an MBSE tool. The diagrams represent operator actions, actors, cues, automation interactions and system behaviour, and can be simulated to evaluate SOP performance, including the distributions of Allowable Operational Time Window, Time on Procedure and Procedure Buffer Time, and the Probability of Failure to Complete.",
+    "answer": "Model-Based Systems Engineering (MBSE) can be used to analyze Standard Operating Procedures (SOPs) by modeling and simulating the procedures using LML/SysML Action/Activity Diagrams (ADs). This approach is detailed in the supplied internal document context as follows:\n\n1. **Purpose of Modeling SOPs with MBSE:**\n   - SOPs define a conditional sequence of operator actions required to maintain system safety and efficiency, particularly in complex, hazard-sensitive systems.\n   - MBSE allows for early evaluation of SOPs in the development lifecycle, enabling the identification of design improvements before implementation.\n   - It addresses variability and uncertainty in procedure performance due to factors like human operator proficiency, environment dynamics, and system behavior.\n\n2. **Using Action/Activity Diagrams in MBSE:**\n   - Action Diagrams model the dynamic behavior of SOPs, representing steps and decision points.\n   - These diagrams are commonly supported in MBSE tools and can be executed (simulated).\n   - The process includes building an Action Diagram that includes all tasks, timing, and interactions involved in the SOP.\n\n3. **Performance Analysis via Simulation:**\n   - Simulating the Action Diagram generates distributions for:\n     - Allowable Operational Time Window (AOTW) — the time limit in which the procedure must be completed to avoid hazardous operation.\n     - Time on Procedure (ToP) — the actual time taken to perform the SOP steps, which varies due to human and system factors.\n     - Probability of Buffer Time (PBT) distribution and Probability of Failure to Complete (PFtC) the SOP within the AOTW.\n   - The simulation results help quantify the likelihood that the procedure will be completed on time under various conditions.\n\n4. **Benefits and Insights:**\n   - The act of creating the Action Diagram itself clarifies the complexity and number of steps in the SOP, sometimes revealing overlooked details.\n   - Engineers can qualitatively assess human-automation interaction loops during modeling to identify potential improvements.\n   - Early detection of risks related to timing or steps in the procedure allows for iterative design and validation, reducing hazardous outcomes.\n   - MBSE-based analysis complements empirical testing by covering a broader range of scenarios that may not be feasible to test physically.\n\nIn summary, MBSE leverages Action/Activity Diagrams to precisely model SOPs, simulate their execution considering human and system variability, and quantitatively analyze the risk of procedure failure to complete within required time windows. This supports safer, more efficient procedure design and verification early in the system development cycle.",
+    "route": "internal",
+    "sources": [
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Conclusions, Paragraphs 134–137",
+        "url": null,
+        "score": 0.5897070339351743
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Analyzing Standard Operating Procedures Using Model-Based Systems Engineering Diagrams, Paragraphs 2–7",
+        "url": null,
+        "score": 0.5829393589526342
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Introduction, Paragraphs 37–46",
+        "url": null,
+        "score": 0.556951919072233
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Tom.harold@specinnovations.com, Paragraphs 25–36",
+        "url": null,
+        "score": 0.5169027341709828
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Method for Modelling SOPs in MBSE/SysML Action Diagrams, Paragraphs 74–83",
+        "url": null,
+        "score": 0.511795486818614
+      }
+    ],
+    "metadata": {
+      "route_reason": "retrieval_score_met_threshold",
+      "highest_retrieval_score": 0.5897070339351743,
+      "retrieved_chunk_count": 5,
+      "retrieved_image_count": 3,
+      "retrieval_threshold": 0.3
+    }
+  },
+  {
+    "question": "What are Time on Procedure, Allowable Operational Time Window, Procedure Buffer Time and Probability of Failure to Complete in SOP analysis?",
+    "reference": "Time on Procedure is the time required to complete the SOP, while the Allowable Operational Time Window is the time available to complete it safely. Procedure Buffer Time is the difference between AOTW and ToP. When PBT is below zero, ToP has exceeded AOTW, and the probability of this occurring is the Probability of Failure to Complete, which is used as a measure of SOP reliability.",
+    "answer": "Time on Procedure (ToP), Allowable Operational Time Window (AOTW), Procedure Buffer Time (PBT), and Probability of Failure to Complete (PFtC) are key performance metrics used in the analysis of Standard Operating Procedures (SOPs) as follows:\n\n1. **Time on Procedure (ToP)**  \n   - ToP is the actual time taken by human operators to complete a given SOP.  \n   - It is a quantifiable measure of operator performance during the execution of the procedure.\n\n2. **Allowable Operational Time Window (AOTW)**  \n   - AOTW is the maximum allowable time within which the SOP must be completed to avoid hazardous outcomes.  \n   - This time window may vary due to complex plant dynamics and is not always fixed.\n\n3. **Procedure Buffer Time (PBT)**  \n   - PBT is defined as the difference between AOTW and ToP for each execution of the SOP:  \n     \\[\n     \\text{PBT} = \\text{AOTW} - \\text{ToP}\n     \\]  \n   - It reflects the time margin available beyond the procedure completion time within the allowable window.  \n   - PBT values less than zero indicate that the procedure exceeded the allowed time limit.\n\n4. **Probability of Failure to Complete (PFtC)**  \n   - PFtC is the probability that the ToP exceeds the AOTW, corresponding to the left-tail of the PBT distribution below zero.  \n   - It quantifies the reliability of the SOP, indicating the likelihood that the procedure will not be completed in time to prevent a hazardous outcome.  \n   - In practice, a threshold for PFtC (e.g., 5th percentile) is set to evaluate SOP performance; the SOP design is iterated to keep PFtC below this threshold.\n\nIn summary, ToP measures how long operators actually take to perform the SOP, AOTW is the maximum allowed duration, PBT represents the time margin left after completion, and PFtC is the risk metric expressing how often the procedure fails to complete within safe time. These metrics together enable a quantitative assessment of SOP effectiveness and reliability within operational contexts.",
+    "route": "internal",
+    "sources": [
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Performance of the SOP, Paragraphs 57–61",
+        "url": null,
+        "score": 0.6177112110230535
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Tom.harold@specinnovations.com, Paragraphs 25–36",
+        "url": null,
+        "score": 0.5259404367881577
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Conclusions, Paragraphs 134–137",
+        "url": null,
+        "score": 0.5198354102189148
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Case Study: Airliner Takeoff Procedure, Paragraphs 116–133",
+        "url": null,
+        "score": 0.5188453710306388
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Evaluate:, Paragraphs 108–115",
+        "url": null,
+        "score": 0.49752830542559423
+      }
+    ],
+    "metadata": {
+      "route_reason": "retrieval_score_met_threshold",
+      "highest_retrieval_score": 0.6177112110230535,
+      "retrieved_chunk_count": 5,
+      "retrieved_image_count": 3,
+      "retrieval_threshold": 0.3
+    }
+  },
+  {
+    "question": "What factors can affect the performance and reliability of a Standard Operating Procedure?",
+    "reference": "SOP performance is affected by the saliency of the cues that trigger operator decisions and actions. Important factors include whether a cue is in the operator's field of view, whether it is obscured by clutter or background noise, whether its meaning clearly matches the required action, whether data manipulation is required, and whether the operator must rely on long-term or working memory. Less salient, ambiguous, infrequent or memory-dependent cues can increase the Probability of Failure to Complete.",
+    "answer": "The performance and reliability of a Standard Operating Procedure (SOP) are affected primarily by how effectively human operators can detect and respond to cues that trigger decision and action steps within the procedure. According to the internal document context, the key factors influencing SOP performance and reliability include:\n\n1. **Saliency of Cues**  \n   - Whether the cues are within the operator's Field of View (FoV).  \n   - Whether the cues are presented without clutter or background noise interfering.  \n   - Whether the semantic meaning of the cue clearly matches the decisions and actions required.  \n   - Whether the operator must perform data manipulation (e.g., calculations, look-ups) to act on the cues.\n\n2. **Type and Frequency of Memory Cues**  \n   - If environmental or automation cues are absent, operators rely on Long-Term Memory (LTM) or Working Memory (WM) cues.  \n   - LTM cues are memorized procedure steps, and those used frequently tend to be reliable. Infrequently used LTM cues (less than once every 3 months) or those used only in emergencies tend to be less reliable and increase the Probability of Failure to Complete (PFtC).  \n   - WM cues require holding information temporarily; if they must be retained more than 7 seconds or in environments prone to interruptions, reliability suffers.\n\n3. **Human Factors and Operational Conditions**  \n   - Variability in operator experience, proficiency, fatigue, attention, and reaction times affects the Time on Procedure (ToP) and thus SOP reliability.  \n   - Environmental and plant dynamics can affect the Allowable Operational Time Window (AOTW), which in turn impacts the buffer for completing the SOP safely.\n\n4. **Design and Automation Interface**  \n   - Automation display designs that enhance cue saliency by moving cues from memory-based triggers to more direct visual, aural, or tactile cues can improve reliability.  \n   - Poorly designed cues, semantic ambiguity, cluttered displays, or requirements for complex data processing increase failure risk.\n\nIn summary, SOP performance and reliability degrade when cues are hard to detect or interpret, rely heavily on infrequent memory recall, require complex data manipulation, or when operators are subject to fatigue and distracting conditions. Conversely, clear, salient cues that are readily available in the operator's field of view and frequently reinforced by automation improve performance and reduce the risk of SOP failure.",
+    "route": "internal",
+    "sources": [
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Performance of the SOP, Paragraphs 57–61",
+        "url": null,
+        "score": 0.5000556260656437
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Conclusions, Paragraphs 134–137",
+        "url": null,
+        "score": 0.4607471690554289
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Tom.harold@specinnovations.com, Paragraphs 25–36",
+        "url": null,
+        "score": 0.4540480735492429
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Factors that Affect the Performance of the SOP, Paragraphs 62–73",
+        "url": null,
+        "score": 0.440664564792015
+      },
+      {
+        "source_type": "internal",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Introduction, Paragraphs 37–46",
+        "url": null,
+        "score": 0.4230701061781275
+      }
+    ],
+    "metadata": {
+      "route_reason": "retrieval_score_met_threshold",
+      "highest_retrieval_score": 0.5000556260656437,
+      "retrieved_chunk_count": 5,
+      "retrieved_image_count": 3,
+      "retrieval_threshold": 0.3
+    }
+  }
+]

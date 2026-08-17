@@ -1,0 +1,22 @@
+id,question,expected_route,actual_route,correct,highest_retrieval_score,route_reason
+1,How can Model-Based Systems Engineering be used to analyse Standard Operating Procedures?,internal,internal,True,0.5897070339351743,retrieval_score_met_threshold
+2,"What are Time on Procedure, Allowable Operational Time Window, Procedure Buffer Time and Probability of Failure to Complete in SOP analysis?",internal,internal,True,0.6177112110230535,retrieval_score_met_threshold
+3,What factors can affect the performance and reliability of a Standard Operating Procedure?,internal,internal,True,0.5000538373740682,retrieval_score_met_threshold
+4,What are the objectives of the process automation system?,internal,internal,True,0.6769139389641562,retrieval_score_met_threshold
+5,What levels make up the process automation system architecture and what is the role of each level?,internal,internal,True,0.6204659175950055,retrieval_score_met_threshold
+6,What are the main requirements for material management and tracking in the process automation system?,internal,internal,True,0.5321415625784115,retrieval_score_met_threshold
+7,What should the diagnostic process for occupational diseases include?,internal,internal,True,0.5652978972346597,retrieval_score_met_threshold
+8,What are the reporting requirements for occupational diseases in Singapore?,internal,internal,True,0.6365654286235894,retrieval_score_met_threshold
+9,What are the general diagnostic criteria for determining whether a cancer is occupational?,internal,internal,True,0.6081999444626733,retrieval_score_met_threshold
+10,What does the GUIDE process stand for in Design for Safety reviews?,internal,internal,True,0.5798004768347941,retrieval_score_met_threshold
+11,What is the Developer's duty when dealing with foreseeable design risks under Design for Safety?,internal,internal,True,0.5495962164477544,retrieval_score_met_threshold
+12,What are the two key purposes of the Design for Safety Register?,internal,internal,True,0.5239966446294673,retrieval_score_met_threshold
+13,What are the five elements required for a combustible dust explosion to occur?,internal,internal,True,0.5844877524388172,retrieval_score_met_threshold
+14,What is a Dust Hazard Analysis and what should it evaluate where a combustible dust hazard exists?,internal,internal,True,0.5637849539346887,retrieval_score_met_threshold
+15,How should combustible dust hazards be controlled using the Hierarchy of Control?,internal,internal,True,0.6287404401216414,retrieval_score_met_threshold
+16,What are the six common hazards identified in the food and beverage manufacturing industry?,internal,internal,True,0.4874244626658299,retrieval_score_met_threshold
+17,What safety measures should be taken to prevent workers from being caught in machines?,internal,internal,True,0.5437048749745468,retrieval_score_met_threshold
+18,What measures are recommended to prevent fires and explosions in food and beverage manufacturing?,internal,internal,True,0.49153013592420697,retrieval_score_met_threshold
+19,What are the main roles and responsibilities of a COMAH Intervention Manager?,internal,internal,True,0.7026838736702157,retrieval_score_met_threshold
+20,What is the purpose of the COMAH Intervention Plan and what types of interventions may it include?,internal,internal,True,0.6351996182696404,retrieval_score_met_threshold
+21,"How does the COMAH challenge mechanism progress through Stages 1, 2 and 3 if an issue cannot be resolved informally?",internal,internal,True,0.61914806697833,retrieval_score_met_threshold
