@@ -1,149 +1,152 @@
 [
   {
-    "question": "What is combustible dust?",
-    "reference": "Combustible dust is a finely divided combustible particulate solid that can create a flash fire or explosion hazard when suspended in air under suitable conditions.",
-    "answer": "Combustible dust refers to any finely divided combustible particulate solid—regardless of size, shape, or chemical composition—that, when processed, stored, or handled in a facility, presents a flash fire hazard or an explosion hazard when suspended in air or a process-specific oxidising medium over a range of concentrations. When such dust is suspended at an optimal concentration in air under specific conditions, it can ignite and cause rapid burning or explosive incidents.",
+    "question": "How can Model-Based Systems Engineering be used to analyse Standard Operating Procedures?",
+    "reference": "SOPs can be modelled using LML/SysML Action or Activity Diagrams in an MBSE tool. The diagrams represent operator actions, actors, cues, automation interactions and system behaviour, and can be simulated to evaluate SOP performance, including the distributions of Allowable Operational Time Window, Time on Procedure and Procedure Buffer Time, and the Probability of Failure to Complete.",
+    "answer": "Model-Based Systems Engineering (MBSE) can be used to analyze Standard Operating Procedures (SOPs) by modeling and simulating the procedures using LML/SysML Action/Activity Diagrams (ADs). This approach is detailed in the supplied internal document context as follows:\n\n1. **Purpose of Modeling SOPs with MBSE:**\n   - SOPs define a conditional sequence of operator actions required to maintain system safety and efficiency, particularly in complex, hazard-sensitive systems.\n   - MBSE allows for early evaluation of SOPs in the development lifecycle, enabling the identification of design improvements before implementation.\n   - It addresses variability and uncertainty in procedure performance due to factors like human operator proficiency, environment dynamics, and system behavior.\n\n2. **Using Action/Activity Diagrams in MBSE:**\n   - Action Diagrams model the dynamic behavior of SOPs, representing steps and decision points.\n   - These diagrams are commonly supported in MBSE tools and can be executed (simulated).\n   - The process includes building an Action Diagram that includes all tasks, timing, and interactions involved in the SOP.\n\n3. **Performance Analysis via Simulation:**\n   - Simulating the Action Diagram generates distributions for:\n     - Allowable Operational Time Window (AOTW) — the time limit in which the procedure must be completed to avoid hazardous operation.\n     - Time on Procedure (ToP) — the actual time taken to perform the SOP steps, which varies due to human and system factors.\n     - Probability of Buffer Time (PBT) distribution and Probability of Failure to Complete (PFtC) the SOP within the AOTW.\n   - The simulation results help quantify the likelihood that the procedure will be completed on time under various conditions.\n\n4. **Benefits and Insights:**\n   - The act of creating the Action Diagram itself clarifies the complexity and number of steps in the SOP, sometimes revealing overlooked details.\n   - Engineers can qualitatively assess human-automation interaction loops during modeling to identify potential improvements.\n   - Early detection of risks related to timing or steps in the procedure allows for iterative design and validation, reducing hazardous outcomes.\n   - MBSE-based analysis complements empirical testing by covering a broader range of scenarios that may not be feasible to test physically.\n\nIn summary, MBSE leverages Action/Activity Diagrams to precisely model SOPs, simulate their execution considering human and system variability, and quantitatively analyze the risk of procedure failure to complete within required time windows. This supports safer, more efficient procedure design and verification early in the system development cycle.",
     "route": "internal",
     "sources": [
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 1",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Conclusions, Paragraphs 134–137",
         "url": null,
-        "score": 0.7116471704688394
+        "score": 0.5897070339351743
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 8",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Analyzing Standard Operating Procedures Using Model-Based Systems Engineering Diagrams, Paragraphs 2–7",
         "url": null,
-        "score": 0.6975153841794461
+        "score": 0.5829393589526342
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 6",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Introduction, Paragraphs 37–46",
         "url": null,
-        "score": 0.69461279391864
+        "score": 0.556951919072233
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 14",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Tom.harold@specinnovations.com, Paragraphs 25–36",
         "url": null,
-        "score": 0.6874792965163957
+        "score": 0.5169027341709828
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 31",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Method for Modelling SOPs in MBSE/SysML Action Diagrams, Paragraphs 74–83",
         "url": null,
-        "score": 0.6761974415497486
+        "score": 0.511795486818614
       }
     ],
     "metadata": {
       "route_reason": "retrieval_score_met_threshold",
-      "highest_retrieval_score": 0.7116471704688394,
+      "highest_retrieval_score": 0.5897070339351743,
       "retrieved_chunk_count": 5,
-      "retrieval_threshold": 0.0
+      "retrieved_image_count": 3,
+      "retrieval_threshold": 0.3
     }
   },
   {
-    "question": "What elements are required for a combustible dust explosion?",
-    "reference": "The five elements are combustible dust as fuel, oxygen, an ignition source, dispersion of dust in air, and confinement.",
-    "answer": "The elements required for a combustible dust explosion, collectively known as the dust explosion pentagon, are:\n\n1. **Fuel** – combustible dust particles suspended in air.\n2. **Oxygen** – present in the air to support combustion.\n3. **Ignition source** – an energy source sufficient to ignite the dust particles (e.g., naked flames, sparks, static electricity, hot surfaces).\n4. **Dispersion** – the dust must be suspended in air, forming a dust cloud at or above the minimum explosible concentration.\n5. **Confinement** – the dust cloud must be within an enclosed or semi-enclosed space that allows pressure build-up.\n\nAll five elements must coexist for a combustible dust explosion to occur.",
+    "question": "What are Time on Procedure, Allowable Operational Time Window, Procedure Buffer Time and Probability of Failure to Complete in SOP analysis?",
+    "reference": "Time on Procedure is the time required to complete the SOP, while the Allowable Operational Time Window is the time available to complete it safely. Procedure Buffer Time is the difference between AOTW and ToP. When PBT is below zero, ToP has exceeded AOTW, and the probability of this occurring is the Probability of Failure to Complete, which is used as a measure of SOP reliability.",
+    "answer": "Time on Procedure (ToP), Allowable Operational Time Window (AOTW), Procedure Buffer Time (PBT), and Probability of Failure to Complete (PFtC) are key performance metrics used in the analysis of Standard Operating Procedures (SOPs) as follows:\n\n1. **Time on Procedure (ToP)**  \n   - ToP is the actual time taken by human operators to complete a given SOP.  \n   - It is a quantifiable measure of operator performance during the execution of the procedure.\n\n2. **Allowable Operational Time Window (AOTW)**  \n   - AOTW is the maximum allowable time within which the SOP must be completed to avoid hazardous outcomes.  \n   - This time window may vary due to complex plant dynamics and is not always fixed.\n\n3. **Procedure Buffer Time (PBT)**  \n   - PBT is defined as the difference between AOTW and ToP for each execution of the SOP:  \n     \\[\n     \\text{PBT} = \\text{AOTW} - \\text{ToP}\n     \\]  \n   - It reflects the time margin available beyond the procedure completion time within the allowable window.  \n   - PBT values less than zero indicate that the procedure exceeded the allowed time limit.\n\n4. **Probability of Failure to Complete (PFtC)**  \n   - PFtC is the probability that the ToP exceeds the AOTW, corresponding to the left-tail of the PBT distribution below zero.  \n   - It quantifies the reliability of the SOP, indicating the likelihood that the procedure will not be completed in time to prevent a hazardous outcome.  \n   - In practice, a threshold for PFtC (e.g., 5th percentile) is set to evaluate SOP performance; the SOP design is iterated to keep PFtC below this threshold.\n\nIn summary, ToP measures how long operators actually take to perform the SOP, AOTW is the maximum allowed duration, PBT represents the time margin left after completion, and PFtC is the risk metric expressing how often the procedure fails to complete within safe time. These metrics together enable a quantitative assessment of SOP effectiveness and reliability within operational contexts.",
     "route": "internal",
     "sources": [
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 6",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Performance of the SOP, Paragraphs 57–61",
         "url": null,
-        "score": 0.608677528142109
+        "score": 0.6177112110230535
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 8",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Tom.harold@specinnovations.com, Paragraphs 25–36",
         "url": null,
-        "score": 0.5762169268722815
+        "score": 0.5259404367881577
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 17",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Conclusions, Paragraphs 134–137",
         "url": null,
-        "score": 0.4998401600183829
+        "score": 0.5198354102189148
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 1",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Case Study: Airliner Takeoff Procedure, Paragraphs 116–133",
         "url": null,
-        "score": 0.48396868498802
+        "score": 0.5188453710306388
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 10",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Evaluate:, Paragraphs 108–115",
         "url": null,
-        "score": 0.48365801394009544
+        "score": 0.49752830542559423
       }
     ],
     "metadata": {
       "route_reason": "retrieval_score_met_threshold",
-      "highest_retrieval_score": 0.608677528142109,
+      "highest_retrieval_score": 0.6177112110230535,
       "retrieved_chunk_count": 5,
-      "retrieval_threshold": 0.0
+      "retrieved_image_count": 3,
+      "retrieval_threshold": 0.3
     }
   },
   {
-    "question": "What are some ways to control combustible dust hazards?",
-    "reference": "Controls include reducing dust generation and accumulation, effective extraction and collection, good housekeeping, controlling ignition sources, and appropriate explosion prevention and protection measures.",
-    "answer": "Some effective ways to control combustible dust hazards include:\n\n1. **Elimination**  \n   - Remove the combustible dust hazard entirely from the process or workplace, for example by avoiding the use of combustible dust materials when possible.\n\n2. **Substitution**  \n   - Replace combustible dust materials with less hazardous alternatives, such as using materials in pellet, paste, or slurry form instead of powder.\n\n3. **Engineering Controls**  \n   - Use physical means to reduce dust explosion risk, including:  \n     - Local exhaust ventilation and dust collection systems to prevent dust accumulation and capture dust at the source.  \n     - Equipment designed to avoid ignition sources, including bonding and grounding to prevent electrostatic sparks.  \n     - Conduct Hazardous Area Classification (HAC) to identify locations where dust clouds may form and install suitable explosion-proof or non-sparking equipment.  \n     - Install ignition control measures such as spark detection systems and use non-sparking tools.  \n     - Use explosion suppression systems that detect pressure or heat and automatically inject suppressants to limit explosions.  \n     - Use dust suppression systems, such as liquid mist sprays, to prevent dust from becoming airborne.\n\n4. **Administrative Controls**  \n   - Establish safe work procedures including no smoking policies in dust areas.  \n   - Conduct regular cleaning with appropriate methods (e.g., wet cleaning or explosion-proof vacuum cleaners) to prevent dust accumulation.  \n   - Train workers on combustible dust hazards, safe handling, and housekeeping.  \n   - Implement emergency response plans with regular drills.\n\n5. **Personal Protective Equipment (PPE)**  \n   - Equip workers with flame retardant clothing, static dissipative safety shoes, and dust respirators.  \n   - Conduct fit testing and fit checks for respiratory protection.\n\nThese controls are most effective when applied following the Hierarchy of Control, starting with elimination and substitution before applying engineering, administrative controls, and PPE in combination as needed.",
+    "question": "What factors can affect the performance and reliability of a Standard Operating Procedure?",
+    "reference": "SOP performance is affected by the saliency of the cues that trigger operator decisions and actions. Important factors include whether a cue is in the operator's field of view, whether it is obscured by clutter or background noise, whether its meaning clearly matches the required action, whether data manipulation is required, and whether the operator must rely on long-term or working memory. Less salient, ambiguous, infrequent or memory-dependent cues can increase the Probability of Failure to Complete.",
+    "answer": "The performance and reliability of a Standard Operating Procedure (SOP) are affected primarily by how effectively human operators can detect and respond to cues that trigger decision and action steps within the procedure. According to the internal document context, the key factors influencing SOP performance and reliability include:\n\n1. **Saliency of Cues**  \n   - Whether the cues are within the operator's Field of View (FoV).  \n   - Whether the cues are presented without clutter or background noise interfering.  \n   - Whether the semantic meaning of the cue clearly matches the decisions and actions required.  \n   - Whether the operator must perform data manipulation (e.g., calculations, look-ups) to act on the cues.\n\n2. **Type and Frequency of Memory Cues**  \n   - If environmental or automation cues are absent, operators rely on Long-Term Memory (LTM) or Working Memory (WM) cues.  \n   - LTM cues are memorized procedure steps, and those used frequently tend to be reliable. Infrequently used LTM cues (less than once every 3 months) or those used only in emergencies tend to be less reliable and increase the Probability of Failure to Complete (PFtC).  \n   - WM cues require holding information temporarily; if they must be retained more than 7 seconds or in environments prone to interruptions, reliability suffers.\n\n3. **Human Factors and Operational Conditions**  \n   - Variability in operator experience, proficiency, fatigue, attention, and reaction times affects the Time on Procedure (ToP) and thus SOP reliability.  \n   - Environmental and plant dynamics can affect the Allowable Operational Time Window (AOTW), which in turn impacts the buffer for completing the SOP safely.\n\n4. **Design and Automation Interface**  \n   - Automation display designs that enhance cue saliency by moving cues from memory-based triggers to more direct visual, aural, or tactile cues can improve reliability.  \n   - Poorly designed cues, semantic ambiguity, cluttered displays, or requirements for complex data processing increase failure risk.\n\nIn summary, SOP performance and reliability degrade when cues are hard to detect or interpret, rely heavily on infrequent memory recall, require complex data manipulation, or when operators are subject to fatigue and distracting conditions. Conversely, clear, salient cues that are readily available in the operator's field of view and frequently reinforced by automation improve performance and reduce the risk of SOP failure.",
     "route": "internal",
     "sources": [
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 14",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Performance of the SOP, Paragraphs 57–61",
         "url": null,
-        "score": 0.614686950928568
+        "score": 0.5000556260656437
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 16",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Conclusions, Paragraphs 134–137",
         "url": null,
-        "score": 0.6135394721538647
+        "score": 0.4607471690554289
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 21",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Tom.harold@specinnovations.com, Paragraphs 25–36",
         "url": null,
-        "score": 0.5656524452684218
+        "score": 0.4540480735492429
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 31",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Factors that Affect the Performance of the SOP, Paragraphs 62–73",
         "url": null,
-        "score": 0.5594022189412419
+        "score": 0.440664564792015
       },
       {
         "source_type": "internal",
-        "title": "combustible-dust-guidelines-2025.pdf",
-        "location": "Page 17",
+        "title": "analyzing-sop-using-mbse-2021.docx",
+        "location": "Section: Introduction, Paragraphs 37–46",
         "url": null,
-        "score": 0.5541883595296365
+        "score": 0.4230701061781275
       }
     ],
     "metadata": {
       "route_reason": "retrieval_score_met_threshold",
-      "highest_retrieval_score": 0.614686950928568,
+      "highest_retrieval_score": 0.5000556260656437,
       "retrieved_chunk_count": 5,
-      "retrieval_threshold": 0.0
+      "retrieved_image_count": 3,
+      "retrieval_threshold": 0.3
     }
   }
 ]

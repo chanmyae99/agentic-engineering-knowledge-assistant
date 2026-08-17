@@ -214,14 +214,18 @@ class AgentService:
             chunks=chunks,
             highest_score=highest_score,
         ):
+            images = self._retrieval_service.retrieve_images(
+                query_embedding=embedding_values,
+            )
+
             response = (
                 await self._answer_from_internal_documents(
                     question=cleaned_question,
                     chunks=chunks,
+                    images=images,
                     highest_score=highest_score,
                 )
             )
-        
 
             return response, chunks
 
