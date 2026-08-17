@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+        app: frontend
+
+    spec:
+      containers:
+        - name: frontend
+          image: chanmyae99/knowledge-assistant-frontend:1.0
+
+          ports:
+            - containerPort: 8501
+
+          env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: knowledge-assistant-config
+                  key: BACKEND_URL
+
+            - name: REQUEST_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: knowledge-assistant-config
+                  key: REQUEST_TIMEOUT

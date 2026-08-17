@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: knowledge-assistant-config
+
+data:
+  POSTGRES_DB: "knowledge_assistant"
+  POSTGRES_USER: "knowledge_admin"
+  POSTGRES_HOST: "database-service"
+  POSTGRES_PORT: "5432"
+
+  REPOSITORY_TYPE: "postgres"
+  TOP_K: "5"
+  RETRIEVAL_SCORE_THRESHOLD: "0.30"
+
+  BACKEND_URL: "http://backend-service:8000"
+  REQUEST_TIMEOUT: "60"

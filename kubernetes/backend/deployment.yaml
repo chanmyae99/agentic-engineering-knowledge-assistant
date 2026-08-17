@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+
+spec:
+  replicas: 3
+  minReadySeconds: 10
+  
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers:
+        - name: backend
+          image: chanmyae99/knowledge-assistant-backend:1.0
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8000
+
+          env:
+            - name: REPOSITORY_TYPE
+              valueFrom:
+                configMapKeyRef:
+                  name: knowledge-assistant-config
+                  key: REPOSITORY_TYPE
+
+            - name: TOP_K
+              valueFrom:
+                configMapKeyRef:
+                  name: knowledge-assistant-config
+                  key: TOP_K
+
+            - name: RETRIEVAL_SCORE_THRESHOLD
+              valueFrom:
+                configMapKeyRef:
+                  name: knowledge-assistant-config
+                  key: RETRIEVAL_SCORE_THRESHOLD
+
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: knowledge-assistant-secrets
+                  key: DATABASE_URL
+
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: knowledge-assistant-secrets
+                  key: OPENAI_API_KEY
+
+            - name: SERPER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: knowledge-assistant-secrets
+                  key: SERPER_API_KEY
+
+            - name: AZURE_STORAGE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: knowledge-assistant-secrets
+                  key: AZURE_STORAGE_CONNECTION_STRING

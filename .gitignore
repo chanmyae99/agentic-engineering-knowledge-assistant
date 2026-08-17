@@ -8,3 +8,6 @@ __pycache__/
 
 # Environment variables / secrets
 .env
+
+# Kubernetes local secrets
+kubernetes/secret.yaml
