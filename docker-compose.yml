@@ -1,0 +1,89 @@
+services:
+  database:
+    build:
+      context: ./database-service
+    container_name: knowledge-assistant-db
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-knowledge_assistant}
+      POSTGRES_USER: ${POSTGRES_USER:-knowledge_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-knowledge_admin_password}
+
+    ports:
+      - "15432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-knowledge_admin} -d ${POSTGRES_DB:-knowledge_assistant}"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    restart: unless-stopped
+
+    networks:
+      - knowledge-assistant-network
+
+
+  backend:
+    build:
+      context: ./backend-service
+    container_name: knowledge-assistant-backend
+
+    env_file:
+      - ./backend-service/.env
+
+    environment:
+      REPOSITORY_TYPE: postgres
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-knowledge_admin}:${POSTGRES_PASSWORD:-knowledge_admin_password}@database:5432/${POSTGRES_DB:-knowledge_assistant}
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      database:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    networks:
+      - knowledge-assistant-network
+
+
+  frontend:
+    build:
+      context: ./frontend-service
+    container_name: knowledge-assistant-frontend
+
+    environment:
+      BACKEND_URL: http://backend:8000
+      REQUEST_TIMEOUT: 60
+
+    ports:
+      - "8501:8501"
+
+    depends_on:
+      - backend
+
+    restart: unless-stopped
+
+    networks:
+      - knowledge-assistant-network
+
+
+volumes:
+  postgres_data:
+    name: knowledge-assistant-postgres-data
+
+
+networks:
+  knowledge-assistant-network:
+    name: knowledge-assistant-network
+    driver: bridge

@@ -16,3 +16,12 @@ tests/
 .vscode/
 
 .idea/
+
+evaluation-service/
+__pycache__/
+*.pyc
+.venv/
+.env
+.git/
+.vscode/
+.idea/

@@ -1,0 +1,11 @@
+.env
+.git/
+.gitignore
+
+tests/
+design/
+scripts/
+migrations/
+kubernetes/
+
+database-service/
