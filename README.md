@@ -32,6 +32,7 @@
 - [6. Microservices](#6-microservices)
   - [6.1 Frontend Service](#61-frontend-service)
   - [6.2 Backend Service](#62-backend-service)
+  - [6.3 Database Service](#63-database-service)
 - [7. Dataset and Data Sources](#7-dataset-and-data-sources)
 - [8. AI and RAG Workflow](#8-ai-and-rag-workflow)
 - [9. Project Structure](#9-project-structure)
